@@ -14,9 +14,8 @@ app.post("/webhook/*", async (c) => {
   } catch (err) {
     if (err instanceof Error) {
       if (err.name === "ZodError") {
-        await postTraqMessage(
-          `未対応のイベントが発生しました。(type: \`${payload.webhookEvent}\`)`,
-        );
+        console.error("Unknown event detected");
+        console.log(JSON.stringify(payload));
       }
     }
     console.error(err);
