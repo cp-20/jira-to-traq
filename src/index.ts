@@ -1,7 +1,14 @@
+import cron from "node-cron";
 import { Hono } from "hono";
 import { eventSchema } from "./event";
 import { createMessage } from "./message";
 import { postTraqMessage } from "./traq";
+import { getReminderMessage } from "./reminder";
+
+cron.schedule("0 8 * * *", async () => {
+  const message = await getReminderMessage();
+  await postTraqMessage(message);
+}, { timezone: "Asia/Tokyo" });
 
 const app = new Hono();
 

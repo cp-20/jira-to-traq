@@ -1,20 +1,12 @@
 import { createHmac } from "crypto";
-
-const webhookUrl = process.env.TRAQ_WEBHOOK_URL;
-if (!webhookUrl) {
-  throw new Error("TRAQ_WEBHOOK_URL is not set");
-}
-const webhookSecret = process.env.TRAQ_WEBHOOK_SECRET;
-if (!webhookSecret) {
-  throw new Error("TRAQ_WEBHOOK_SECRET is not set");
-}
+import { TRAQ_WEBHOOK_SECRET, TRAQ_WEBHOOK_URL } from "./env";
 
 export const postTraqMessage = async (message: string) => {
-  const res = await fetch(webhookUrl, {
+  const res = await fetch(TRAQ_WEBHOOK_URL, {
     method: "POST",
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
-      "X-TRAQ-Signature": calcHmacSha1(message, webhookSecret),
+      "X-TRAQ-Signature": calcHmacSha1(message, TRAQ_WEBHOOK_SECRET),
     },
     body: message,
   });

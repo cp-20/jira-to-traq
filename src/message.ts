@@ -1,25 +1,13 @@
+import { JIRA_ORG_ID, JIRA_USER_ID_MAP_JSON } from "./env";
 import { Event } from "./event";
 
-const orgId = process.env.ORG_ID;
-if (!orgId) {
-  throw new Error("ORG_ID is not set");
-}
-
-if (!process.env.USER_ID_MAP) {
-  throw new Error("USER_ID_MAP is not set");
-}
-const userIdMap = JSON.parse(process.env.USER_ID_MAP ?? "{}") as Record<
-  string,
-  string
->;
-
 export const createUserMention = (userId: string): string => {
-  const username = userIdMap[userId];
+  const username = JIRA_USER_ID_MAP_JSON[userId];
   return `@${username}`;
 };
 
 export const createIssueLink = (issueKey: string): string => {
-  return `//${orgId}.atlassian.net/browse/${issueKey}`;
+  return `//${JIRA_ORG_ID}.atlassian.net/browse/${issueKey}`;
 };
 
 export const createMessage = (event: Event): string => {
