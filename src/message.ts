@@ -10,6 +10,15 @@ export const createIssueLink = (issueKey: string): string => {
   return `//${JIRA_ORG_ID}.atlassian.net/browse/${issueKey}`;
 };
 
+const formatDate = (date: string | null | undefined): string => {
+  if (!date) return "未設定";
+  const d = new Date(date);
+  return d.toLocaleDateString("ja-JP", {
+    month: "numeric",
+    day: "numeric",
+  });
+};
+
 export const createMessage = (event: Event): string => {
   if (
     event.webhookEvent === "jira:issue_created" ||
@@ -35,6 +44,18 @@ export const createMessage = (event: Event): string => {
         const status = event.issue.fields.status;
         const statusName = status.name;
         return `${user} によって **[:jira: ${title}](${link})** のステータスが ${statusName} に変更されました。`;
+      } else if (event.issue_event_type_name === "issue_updated") {
+        if (
+          event.changelog &&
+          event.changelog.items.some((item) => item.field === "duedate")
+        ) {
+          const dueDateItem = event.changelog.items.find(
+            (item) => item.field === "duedate",
+          );
+          const from = formatDate(dueDateItem?.fromString);
+          const to = formatDate(dueDateItem?.toString);
+          return `${user} によって **[:jira: ${title}](${link})** の期限が **${from}** から **${to}** に変更されました。`;
+        }
       }
       return `${user} によって **[:jira: ${title}](${link})** が更新されました。`;
     }

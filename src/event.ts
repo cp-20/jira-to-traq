@@ -158,7 +158,7 @@ const issueCreatedEventSchema = baseEventSchema.extend({
 
 export type IssueCreatedEvent = z.infer<typeof issueCreatedEventSchema>;
 
-const issueUpdatedEventSchema = baseEventSchema.extend({
+const issueUpdatedGenericEventSchema = baseEventSchema.extend({
   webhookEvent: z.literal("jira:issue_updated"),
   issue_event_type_name: z.literal("issue_generic"),
   user: userSchema,
@@ -179,12 +179,36 @@ const issueUpdatedEventSchema = baseEventSchema.extend({
   }),
 });
 
-export type IssueUpdatedEvent = z.infer<typeof issueUpdatedEventSchema>;
+export type IssueUpdatedEvent = z.infer<typeof issueUpdatedGenericEventSchema>;
+
+const issueUpdatedEventSchema = baseEventSchema.extend({
+  webhookEvent: z.literal("jira:issue_updated"),
+  issue_event_type_name: z.literal("issue_updated"),
+  user: userSchema,
+  issue: issueSchema,
+  changelog: z.object({
+    id: z.string(),
+    items: z.array(z.object({
+      field: z.string(),
+      fieldtype: z.string(),
+      fieldId: z.string(),
+      from: z.string().nullable(),
+      fromString: z.string().nullable(),
+      to: z.string().nullable(),
+      toString: z.string().nullable(),
+      tmpFromAccountId: z.string().nullable().optional(),
+      tmpToAccountId: z.string().optional(),
+    })),
+  }),
+});
+
+export type IssueUpdatedDateEvent = z.infer<typeof issueUpdatedEventSchema>;
 
 export const eventSchema = z.union([
   commentCreatedEventSchema,
   issueAssignedEventSchema,
   issueCreatedEventSchema,
+  issueUpdatedGenericEventSchema,
   issueUpdatedEventSchema,
 ]);
 
